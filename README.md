@@ -91,8 +91,17 @@ EXIT;
 
 ## Configure the software
 
+### Set the configuration values
+
 ```
 sudo cp /var/www/html/config.php.example /var/www/html/config.php
 sudo vi /var/www/html/config.php
 ```
 
+### Modify the e-mail templates
+
+```
+sudo vi /var/www/html/templates/admin_verify.txt
+sudo vi /var/www/html/templates/user_newsletter.txt
+sudo vi /var/www/html/templates/user_verifiy.txt
+```
