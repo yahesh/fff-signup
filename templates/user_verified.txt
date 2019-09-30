@@ -1,0 +1,7 @@
+Dear {%NAME},
+
+welcome to Filmmakers for Future!
+
+Your registration has been verified by our organizers.
+
+Again, thank you very much.

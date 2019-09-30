@@ -2,7 +2,99 @@
 
   // generate a random and collision-free token of length 40
   function generate_token() {
-    return dechex(time()).bin2hex(random_bytes(16));
+    return strtolower(dechex(time()).bin2hex(random_bytes(16)));
+  }
+
+  // get array element without throwing a notice
+  function get_element($array, $id) {
+    $result = null;
+
+    if (array_key_exists($id, $array)) {
+      $result = $array[$id];
+    }
+
+    return $result;
+  }
+
+  // get subscribed entries
+  function get_subscribed() {
+    $result = [];
+
+    // connect to the database
+    if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
+      try {
+        // we will grab some information
+        $city                  = null;
+        $country               = null;
+        $mail                  = null;
+        $name                  = null;
+        $uid                   = null;
+        $user_newsletter_token = null;
+
+        if ($statement = mysqli_prepare($link, "SELECT city, country, mail, name, uid, user_newsletter_token ".
+                                        "FROM data WHERE subscribed IS TRUE")) {
+          try {
+            if (mysqli_stmt_execute($statement)) {
+              if (mysqli_stmt_bind_result($statement, $city, $country, $mail, $name, $uid, $user_newsletter_token)) {
+                  while (mysqli_stmt_fetch($statement)) {
+                    $result[] = [MAIL_CITY                  => $city,
+                                 MAIL_COUNTRY               => $country,
+                                 MAIL_MAIL                  => $mail,
+                                 MAIL_NAME                  => $name,
+                                 MAIL_UID                   => $uid,
+                                 MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token];
+                  }
+                }
+              }
+          } finally {
+            mysqli_stmt_close($statement);
+          }
+        }
+
+      } finally {
+        mysqli_close($link);
+      }
+    }
+
+    return $result;
+  }
+
+  // get verified entries
+  function get_verified() {
+    $result = [];
+
+    // connect to the database
+    if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
+      try {
+        // we will grab some information
+        $city    = null;
+        $country = null;
+        $mail    = null;
+        $name    = null;
+
+        if ($statement = mysqli_prepare($link, "SELECT city, country, mail, name FROM data WHERE verified IS TRUE")) {
+          try {
+            if (mysqli_stmt_execute($statement)) {
+              if (mysqli_stmt_bind_result($statement, $city, $country, $mail, $name)) {
+                  while (mysqli_stmt_fetch($statement)) {
+                    $result[] = [MAIL_CITY    => $city,
+                                 MAIL_COUNTRY => $country,
+                                 MAIL_MAIL    => $mail,
+                                 MAIL_NAME    => $name];
+                  }
+                }
+              }
+          } finally {
+            mysqli_stmt_close($statement);
+          }
+        }
+
+      } finally {
+        mysqli_close($link);
+      }
+    }
+
+    return $result;
   }
 
   // escape HTML in the given $string
@@ -15,8 +107,8 @@
     $result = false;
 
     //normalize texts
-    $info["uid"]  = strtolower(trim($info["uid"]));
-    $info["user"] = strtolower(trim($info["user"]));
+    $info["uid"]  = strtolower(trim(get_element($info, "uid")));
+    $info["user"] = strtolower(trim(get_element($info, "user")));
 
     // check if the given parameters fulfill minimal requirements
     if ((0 < strlen($info["uid"])) && (0 < strlen($info["user"]))) {
@@ -62,39 +154,24 @@
     $result = false;
 
     //normalize texts
-    $info["mail"] = strtolower(trim($info["mail"]));
+    $info["mail"] = strtolower(trim(get_element($info, "mail")));
+    $info["uid"]  = strtolower(trim(get_element($info, "uid")));
+    $info["user"] = strtolower(trim(get_element($info, "user")));
 
     // normalize newsletter
-    if ("1" === $info["newsletter"]) {
+    if ("1" === get_element($info, "newsletter")) {
       $info["newsletter"] = true;
     } else {
       $info["newsletter"] = false;
     }
 
     // check if the given parameters fulfill minimal requirements
-    if (((0 < strlen($info["uid"])) && (0 < strlen($info["user"]))) || (0 < strlen($info["mail"]))) {
+    if ((0 < strlen($info["mail"])) || ((0 < strlen($info["uid"])) && (0 < strlen($info["user"])))) {
       // connect to the database
       if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
         try {
-          // update newsletter subscription
-          if ((0 < strlen($info["uid"])) && (0 < strlen($info["user"]))) {
-            // generate a new token
-            $user_newsletter_token = generate_token();
-
-            if ($statement = mysqli_prepare($link, "UPDATE data SET newsletter = ?, user_newsletter_token = ? ".
-                                            "WHERE uid = ? AND user_newsletter_token = ?")) {
-              try {
-                if (mysqli_stmt_bind_param($statement, "isss", $info["newsletter"], $user_newsletter_token,
-                                           $info["uid"], $info["user"])) {
-                  if (mysqli_stmt_execute($statement)) {
-                    $result = (1 === mysqli_affected_rows($link));
-                  }
-                }
-              } finally {
-                mysqli_stmt_close($statement);
-              }
-            }
-          } elseif (0 < strlen($info["mail"])) {
+          // send newsletter mail
+          if (0 < strlen($info["mail"])) {
             // we will grab some information
             $admin_verify_token    = null;
             $city                  = null;
@@ -144,6 +221,23 @@
                                    MAIL_USER_VERIFY_TOKEN     => $user_verify_token,
                                    MAIL_WEBSITE               => $website]);
             }
+          } elseif ((0 < strlen($info["uid"])) && (0 < strlen($info["user"]))) {
+            // generate a new token
+            $user_newsletter_token = generate_token();
+
+            if ($statement = mysqli_prepare($link, "UPDATE data SET newsletter = ?, user_newsletter_token = ? ".
+                                            "WHERE uid = ? AND user_newsletter_token = ?")) {
+              try {
+                if (mysqli_stmt_bind_param($statement, "isss", $info["newsletter"], $user_newsletter_token,
+                                           $info["uid"], $info["user"])) {
+                  if (mysqli_stmt_execute($statement)) {
+                    $result = (1 === mysqli_affected_rows($link));
+                  }
+                }
+              } finally {
+                mysqli_stmt_close($statement);
+              }
+	    }
           }
         } finally {
           mysqli_close($link);
@@ -159,22 +253,23 @@
     $result = false;
 
     //normalize texts
-    $info["name"]    = trim($info["name"]);
-    $info["mail"]    = strtolower(trim($info["mail"]));
-    $info["job"]     = trim($info["job"]);
-    $info["website"] = trim($info["website"]);
-    $info["country"] = trim($info["country"]);
-    $info["city"]    = trim($info["city"]);
+    $info["city"]    = trim(get_element($info, "city"));
+    $info["country"] = trim(get_element($info, "country"));
+    $info["job"]     = trim(get_element($info, "job"));
+    $info["mail"]    = strtolower(trim(get_element($info, "mail")));
+    $info["name"]    = trim(get_element($info, "name"));
+    $info["website"] = trim(get_element($info, "website"));
 
     // normalize newsletter
-    if ("1" === $info["newsletter"]) {
+    if ("1" === get_element($info, "newsletter")) {
       $info["newsletter"] = true;
     } else {
       $info["newsletter"] = false;
     }
 
     // check if the given parameters fulfill minimal requirements
-    if ((0 < strlen($info["mail"])) && (0 < strlen($info["name"]))) {
+    if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
+        (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {
       // connect to the database
       if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
         try {
@@ -254,14 +349,16 @@
     return $result;
   }
 
-  function send_mail($recipient, $subject, $body, $placeholders) {
+  function send_mail($recipient, $subject, $body, $placeholders = null) {
     $result = false;
 
     if ($curl = curl_init()) {
       try {
         // replace placeholders
-        $body    = str_replace(array_keys($placeholders), array_values($placeholders), $body);
-        $subject = str_replace(array_keys($placeholders), array_values($placeholders), $subject);
+	if (null !== $placeholders) {
+          $body    = str_replace(array_keys($placeholders), array_values($placeholders), $body);
+          $subject = str_replace(array_keys($placeholders), array_values($placeholders), $subject);
+        }
 
         $parameters = http_build_query(["from"    => MAILGUN_FROM,
                                         "to"      => $recipient,
@@ -295,9 +392,9 @@
     $result = false;
 
     //normalize texts
-    $info["admin"] = strtolower(trim($info["admin"]));
-    $info["uid"]   = strtolower(trim($info["uid"]));
-    $info["user"]  = strtolower(trim($info["user"]));
+    $info["admin"] = strtolower(trim(get_element($info, "admin")));
+    $info["uid"]   = strtolower(trim(get_element($info, "uid")));
+    $info["user"]  = strtolower(trim(get_element($info, "user")));
 
     // check if the given parameters fulfill minimal requirements
     if ((0 < strlen($info["uid"])) && ((0 < strlen($info["admin"])) || (0 < strlen($info["user"])))) {
@@ -376,9 +473,22 @@
     $result = false;
 
     //normalize texts
-    $info["admin"] = strtolower(trim($info["admin"]));
-    $info["uid"]   = strtolower(trim($info["uid"]));
-    $info["user"]  = strtolower(trim($info["user"]));
+    $info["admin"]   = strtolower(trim(get_element($info, "admin")));
+    $info["city"]    = trim(get_element($info, "city"));
+    $info["country"] = trim(get_element($info, "country"));
+    $info["job"]     = trim(get_element($info, "job"));
+    $info["mail"]    = strtolower(trim(get_element($info, "mail")));
+    $info["name"]    = trim(get_element($info, "name"));
+    $info["uid"]     = strtolower(trim(get_element($info, "uid")));
+    $info["user"]    = strtolower(trim(get_element($info, "user")));
+    $info["website"] = trim(get_element($info, "website"));
+
+    // normalize newsletter
+    if ("1" === get_element($info, "newsletter")) {
+      $info["newsletter"] = true;
+    } else {
+      $info["newsletter"] = false;
+    }
 
     // check if the given parameters fulfill minimal requirements
     if ((0 < strlen($info["uid"])) && ((0 < strlen($info["admin"])) || (0 < strlen($info["user"])))) {
@@ -386,21 +496,28 @@
       if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
         try {
           // verify admin token
-          if (0 < strlen($info["admin"])) {
-            if ($statement = mysqli_prepare($link, "UPDATE data SET admin_verify_token = NULL WHERE uid = ? AND ".
-                                            "admin_verify_token = ?")) {
-              try {
-                if (mysqli_stmt_bind_param($statement, "ss", $info["uid"], $info["admin"])) {
-                  if (mysqli_stmt_execute($statement)) {
-                    $result = (1 === mysqli_affected_rows($link));
+          $updated = null;
+	  if (0 < strlen($info["admin"])) {
+            // check if the updatable parameters fulfill minimal requirements
+            if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
+                (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {            
+              if ($statement = mysqli_prepare($link, "UPDATE data SET name = ?, mail = ?, job = ?, website = ?, ".
+                                              "country = ?, city = ?, newsletter = ?, admin_verify_token = NULL ".
+                                              "WHERE uid = ? AND admin_verify_token = ?")) {
+                try {
+                  if (mysqli_stmt_bind_param($statement, "ssssssiss", $info["name"], $info["mail"], $info["job"],
+                                             $info["website"], $info["country"], $info["city"], $info["newsletter"],
+                                             $info["uid"], $info["admin"])) {
+                    if (mysqli_stmt_execute($statement)) {
+                      $updated = (1 === mysqli_affected_rows($link));
+                    }
                   }
+                } finally {
+                  mysqli_stmt_close($statement);
                 }
-              } finally {
-                mysqli_stmt_close($statement);
               }
             }
           } elseif (0 < strlen($info["user"])) {
-            $updated = null;
             if ($statement = mysqli_prepare($link, "UPDATE data SET user_verify_token = NULL WHERE uid = ? AND ".
                                             "user_verify_token = ?")) {
               try {
@@ -413,58 +530,68 @@
                 mysqli_stmt_close($statement);
               }
             }
+          }
 
-            // we will grab some information
-            $admin_verify_token    = null;
-            $city                  = null;
-            $country               = null;
-            $job                   = null;
-            $mail                  = null;
-            $name                  = null;
-            $newsletter            = null;
-            $uid                   = null;
-            $user_newsletter_token = null;
-            $user_verify_token     = null;
-            $website               = null;
+          // we will grab some information
+          $admin_verify_token    = null;
+          $city                  = null;
+          $country               = null;
+          $job                   = null;
+          $mail                  = null;
+          $name                  = null;
+          $newsletter            = null;
+          $uid                   = null;
+          $user_newsletter_token = null;
+          $user_verify_token     = null;
+          $website               = null;
 
-            $selected = null;
-            if ($updated) {
-              if ($statement = mysqli_prepare($link, "SELECT admin_verify_token, city, country, job, mail, name, ".
-                                              "newsletter, uid, user_newsletter_token, user_verify_token, website ".
-                                              "FROM data WHERE uid = ?")) {
-                try {
-                  if (mysqli_stmt_bind_param($statement, "s", $info["uid"])) {
-                    if (mysqli_stmt_execute($statement)) {
-                      if (mysqli_stmt_bind_result($statement, $admin_verify_token, $city, $country, $job, $mail,
-                                                  $name, $newsletter, $uid, $user_newsletter_token, $user_verify_token,
-                                                  $website)) {
-                        if (mysqli_stmt_fetch($statement)) {
-                          $selected = true;
-                        }
+          $selected = null;
+          if ($updated) {
+            if ($statement = mysqli_prepare($link, "SELECT admin_verify_token, city, country, job, mail, name, ".
+                                            "newsletter, uid, user_newsletter_token, user_verify_token, website ".
+                                            "FROM data WHERE uid = ?")) {
+              try {
+                if (mysqli_stmt_bind_param($statement, "s", $info["uid"])) {
+                  if (mysqli_stmt_execute($statement)) {
+                    if (mysqli_stmt_bind_result($statement, $admin_verify_token, $city, $country, $job, $mail,
+                                                $name, $newsletter, $uid, $user_newsletter_token, $user_verify_token,
+                                                $website)) {
+                      if (mysqli_stmt_fetch($statement)) {
+                        $selected = true;
                       }
                     }
                   }
-                } finally {
-                  mysqli_stmt_close($statement);
                 }
+              } finally {
+                mysqli_stmt_close($statement);
               }
             }
+          }
 
-            if ($selected) {
-              // send verification mail to admin
-              $result = send_mail(ADMIN_MAIL, ADMIN_VERIFY_MAIL_SUBJECT, ADMIN_VERIFY_MAIL_BODY,
-                                  [MAIL_ADMIN_VERIFY_TOKEN    => $admin_verify_token,
-                                   MAIL_CITY                  => $city,
-                                   MAIL_COUNTRY               => $country,
-                                   MAIL_JOB                   => $job,
-                                   MAIL_MAIL                  => $mail,
-                                   MAIL_NAME                  => $name,
-                                   MAIL_NEWSLETTER            => ($newsletter) ? "yes" : "no",
-                                   MAIL_UID                   => $uid,
-                                   MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token,
-                                   MAIL_USER_VERIFY_TOKEN     => $user_verify_token,
-                                   MAIL_WEBSITE               => $website]);
+          if ($selected) {
+            // send verified mail to user
+            if (0 < strlen($info["admin"])) {
+              $recipient = $mail;
+              $subject   = USER_VERIFIED_MAIL_SUBJECT;
+              $body      = USER_VERIFIED_MAIL_BODY;
+            } elseif (0 < strlen($info["user"])) {
+              $recipient = ADMIN_MAIL;
+              $subject   = ADMIN_VERIFY_MAIL_SUBJECT;
+              $body      = ADMIN_VERIFY_MAIL_BODY;
             }
+
+            $result = send_mail($recipient, $subject, $body,
+                                [MAIL_ADMIN_VERIFY_TOKEN    => $admin_verify_token,
+                                 MAIL_CITY                  => $city,
+                                 MAIL_COUNTRY               => $country,
+                                 MAIL_JOB                   => $job,
+                                 MAIL_MAIL                  => $mail,
+                                 MAIL_NAME                  => $name,
+                                 MAIL_NEWSLETTER            => ($newsletter) ? "yes" : "no",
+                                 MAIL_UID                   => $uid,
+                                 MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token,
+                                 MAIL_USER_VERIFY_TOKEN     => $user_verify_token,
+                                 MAIL_WEBSITE               => $website]);
           }
         } finally {
           mysqli_close($link);

@@ -6,6 +6,7 @@
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
     $result = preview_newsletter($_GET);
+    $link   = (array_key_exists("uid", $_GET) && !array_key_exists("user", $_GET)); 
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,7 +25,9 @@
       <input type="submit" value="Update">
     </form>
 <?php } else { ?>
+<?php if ($link) { ?>
     The newsletter subscription update link you used is invalid.<br>
+<?php } ?>
     Request a new link:
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
       <input type="email" name="mail" required maxlength="256" placeholder="Mail">
@@ -36,7 +39,7 @@
 <?php
   } elseif ("POST" === HTTP_METHOD) {
     // verify given information
-    $result = newsletter($_REQUEST);
+    $result = newsletter(array_merge($_GET, $_POST));
 ?>
 <!DOCTYPE html>
 <html>

@@ -15,9 +15,9 @@
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
       <input type="text" name="name" required maxlength="256" placeholder="Name">
       <input type="email" name="mail" required maxlength="256" placeholder="Mail">
-      <input type="text" name="job" maxlength="256" placeholder="Job title">
-      <input type="link" name="website" maxlength="256" placeholder="Website / IMDB / Crew United">
-      <input type="text" name="country" maxlength="256" placeholder="Country">
+      <input type="text" name="job" required maxlength="256" placeholder="Job title">
+      <input type="link" name="website" required maxlength="256" placeholder="Website / IMDB / Crew United">
+      <input type="text" name="country" required maxlength="256" placeholder="Country">
       <input type="text" name="city" maxlength="256" placeholder="City">
       <select name="newsletter" required>
         <option value="" disabled selected>Choose option</option>
@@ -31,7 +31,7 @@
 <?php
   } elseif ("POST" === HTTP_METHOD) {
     // register given information
-    $result = register($_POST);
+    $result = register(array_merge($_GET, $_POST));
 ?>
 <!DOCTYPE html>
 <html>

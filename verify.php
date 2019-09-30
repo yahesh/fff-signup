@@ -6,6 +6,7 @@
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
     $result = preview_verify($_GET);
+    $admin = ($result && array_key_exists("uid", $_GET) && array_key_exists("admin", $_GET) && !array_key_exists("user", $_GET));
 ?>
 <!DOCTYPE html>
 <html>
@@ -16,15 +17,16 @@
   <body>
 <?php if ($result) { ?>
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
-      <input type="text" value="<?= html($result["name"]) ?>" disabled readonly>
-      <input type="text" value="<?= html($result["mail"]) ?>" disabled readonly>
-      <input type="text" value="<?= html($result["job"]) ?>" disabled readonly>
-      <input type="text" value="<?= html($result["website"]) ?>" disabled readonly>
-      <input type="text" value="<?= html($result["country"]) ?>" disabled readonly>
-      <input type="text" value="<?= html($result["city"]) ?>" disabled readonly>
-      <select disabled readonly>
-        <option value="0" <?= ($result["newsletter"]) ? "" : "selected" ?> disabled readonly>Just sign the statement.</option>
-        <option value="1" <?= ($result["newsletter"]) ? "selected" : "" ?> disabled readonly>Please keep me updated.</option>
+      <input type="text" name="name" value="<?= html($result["name"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="mail" value="<?= html($result["mail"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="job" value="<?= html($result["job"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="website" value="<?= html($result["website"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="country" value="<?= html($result["country"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="city" value="<?= html($result["city"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <select name="newsletter" <?= ($admin) ? "" : "disabled readonly" ?>>
+        <option value="" disabled>Choose option</option>
+        <option value="0" <?= ($result["newsletter"]) ? "" : "selected" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Just sign the statement.</option>
+        <option value="1" <?= ($result["newsletter"]) ? "selected" : "" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Please keep me updated.</option>
       </select>
       <input type="submit" value="Verify">
     </form>
@@ -36,7 +38,7 @@
 <?php
   } elseif ("POST" === HTTP_METHOD) {
     // verify given information
-    $result = verify($_GET);
+    $result = verify(array_merge($_GET, $_POST));
 ?>
 <!DOCTYPE html>
 <html>

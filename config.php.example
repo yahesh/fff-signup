@@ -4,7 +4,7 @@
   define("MAILGUN_AUTH",     "api:key-0123456789abcdef0123456789abcdef");
   define("MAILGUN_ENDPOINT", "https://api.eu.mailgun.net/v3/mg.filmmakersforfuture.org/messages");
   define("MAILGUN_FROM",     "Filmmakers for Future <noreply@mg.filmmakersforfuture.org>");
-  
+
   define("DB_HOST", "127.0.0.1");
   define("DB_PORT", 3306);
   define("DB_NAME", "fff");
@@ -16,6 +16,9 @@
 
   define("USER_NEWSLETTER_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_newsletter.txt"));
   define("USER_NEWSLETTER_MAIL_SUBJECT", "Filmmakers for Future: Your link to update your newsletter subscription.");
+
+  define("USER_VERIFIED_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_verified.txt"));
+  define("USER_VERIFIED_MAIL_SUBJECT", "Filmmakers for Future: Your registration has been verified!");
 
   define("USER_VERIFY_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_verify.txt"));
   define("USER_VERIFY_MAIL_SUBJECT", "Filmmakers for Future: Please verify your registration!");
