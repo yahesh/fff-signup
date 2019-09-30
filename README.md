@@ -2,10 +2,66 @@
 
 This is a prototype for a signup form.
 
+## Install the software
+
+```
+sudo apt-get install nginx php-fpm php-curl php-mysqli mariadb-server
+
+sudo git clone https://github.com/yahesh/fff-signup /var/www/html
+```
+
+## Configure the webserver
+
+### Open the configuration file
+
+```
+sudo vi /etc/nginx/sites-enabled/default 
+```
+
+### Insert the configuration:
+
+```
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	root /var/www/html;
+
+	index index.php index.html index.htm;
+
+	server_name _;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+	}
+}
+```
+
+### Restart the webserver
+
+```
+sudo systemctl restart nginx.service
+```
+
 ## Setup the database
+
+### Log into the MariaDB database
+
+```
+sudo mysql
+```
+
+### Execute the SQL statements
 
 ```
 CREATE DATABASE fff CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE fff;
 
 CREATE TABLE data (
   uid                   VARCHAR(40)  NOT NULL PRIMARY KEY,
@@ -29,5 +85,14 @@ GRANT ALL ON fff.* TO 'fff'@'localhost' IDENTIFIED BY 'fff';
 GRANT ALL ON fff.* TO 'fff'@'127.0.0.1' IDENTIFIED BY 'fff';
 
 FLUSH PRIVILEGES;
+
+EXIT;
+```
+
+## Configure the software
+
+```
+sudo cp /var/www/html/config.php.example /var/www/html/config.php
+sudo vi /var/www/html/config.php
 ```
 
