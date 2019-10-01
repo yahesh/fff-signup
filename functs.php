@@ -72,14 +72,14 @@
         $mail    = null;
         $name    = null;
 
-        if ($statement = mysqli_prepare($link, "SELECT city, country, mail, name FROM data WHERE verified IS TRUE")) {
+        if ($statement = mysqli_prepare($link, "SELECT job, country, website, name FROM data WHERE verified IS TRUE")) {
           try {
             if (mysqli_stmt_execute($statement)) {
-              if (mysqli_stmt_bind_result($statement, $city, $country, $mail, $name)) {
+              if (mysqli_stmt_bind_result($statement, $job, $country, $website, $name)) {
                   while (mysqli_stmt_fetch($statement)) {
-                    $result[] = [MAIL_CITY    => $city,
+                    $result[] = [MAIL_JOB    => $job,
                                  MAIL_COUNTRY => $country,
-                                 MAIL_MAIL    => $mail,
+                                 MAIL_WEBSITE    => $website,
                                  MAIL_NAME    => $name];
                   }
                 }
