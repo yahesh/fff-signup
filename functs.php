@@ -500,7 +500,7 @@
 	  if (0 < strlen($info["admin"])) {
             // check if the updatable parameters fulfill minimal requirements
             if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
-                (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {            
+                (0 < strlen($info["country"]))) {            
               if ($statement = mysqli_prepare($link, "UPDATE data SET name = ?, mail = ?, job = ?, website = ?, ".
                                               "country = ?, city = ?, newsletter = ?, admin_verify_token = NULL ".
                                               "WHERE uid = ? AND admin_verify_token = ?")) {
