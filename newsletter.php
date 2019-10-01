@@ -6,7 +6,7 @@
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
     $result = preview_newsletter($_GET);
-    $link   = (array_key_exists("uid", $_GET) && !array_key_exists("user", $_GET)); 
+    $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET)); 
 ?>
 <!DOCTYPE html>
 <html>
