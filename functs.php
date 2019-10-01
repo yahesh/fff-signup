@@ -26,23 +26,30 @@
         // we will grab some information
         $city                  = null;
         $country               = null;
+        $job                   = null;
         $mail                  = null;
         $name                  = null;
+        $newsletter            = null;
         $uid                   = null;
         $user_newsletter_token = null;
+        $website               = null;
 
-        if ($statement = mysqli_prepare($link, "SELECT city, country, mail, name, uid, user_newsletter_token ".
-                                        "FROM data WHERE subscribed IS TRUE")) {
+        if ($statement = mysqli_prepare($link, "SELECT city, country, job, mail, name, newsletter, uid, ".
+                                        "user_newsletter_token, website FROM data WHERE subscribed IS TRUE")) {
           try {
             if (mysqli_stmt_execute($statement)) {
-              if (mysqli_stmt_bind_result($statement, $city, $country, $mail, $name, $uid, $user_newsletter_token)) {
+              if (mysqli_stmt_bind_result($statement, $city, $country, $job, $mail, $name, $newsletter, $uid,
+                                          $user_newsletter_token, $website)) {
                   while (mysqli_stmt_fetch($statement)) {
                     $result[] = [MAIL_CITY                  => $city,
                                  MAIL_COUNTRY               => $country,
+                                 MAIL_JOB                   => $job,
                                  MAIL_MAIL                  => $mail,
                                  MAIL_NAME                  => $name,
+                                 MAIL_NEWSLETTER            => $newsletter,
                                  MAIL_UID                   => $uid,
-                                 MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token];
+                                 MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token,
+                                 MAIL_WEBSITE               => $website];
                   }
                 }
               }
@@ -67,20 +74,32 @@
     if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
       try {
         // we will grab some information
-        $city    = null;
-        $country = null;
-        $mail    = null;
-        $name    = null;
+        $city                  = null;
+        $country               = null;
+        $job                   = null;
+        $mail                  = null;
+        $name                  = null;
+        $newsletter            = null;
+        $uid                   = null;
+        $user_newsletter_token = null;
+        $website               = null;
 
-        if ($statement = mysqli_prepare($link, "SELECT city, country, mail, name FROM data WHERE verified IS TRUE")) {
+        if ($statement = mysqli_prepare($link, "SELECT city, country, job, mail, name, newsletter, uid, ".
+                                        "user_newsletter_token, website FROM data WHERE verified IS TRUE")) {
           try {
             if (mysqli_stmt_execute($statement)) {
-              if (mysqli_stmt_bind_result($statement, $city, $country, $mail, $name)) {
+              if (mysqli_stmt_bind_result($statement, $city, $country, $job, $mail, $name, $newsletter, $uid,
+                                          $user_newsletter_token, $website)) {
                   while (mysqli_stmt_fetch($statement)) {
-                    $result[] = [MAIL_CITY    => $city,
-                                 MAIL_COUNTRY => $country,
-                                 MAIL_MAIL    => $mail,
-                                 MAIL_NAME    => $name];
+                    $result[] = [MAIL_CITY                  => $city,
+                                 MAIL_COUNTRY               => $country,
+                                 MAIL_JOB                   => $job,
+                                 MAIL_MAIL                  => $mail,
+                                 MAIL_NAME                  => $name,
+                                 MAIL_NEWSLETTER            => $newsletter,
+                                 MAIL_UID                   => $uid,
+                                 MAIL_USER_NEWSLETTER_TOKEN => $user_newsletter_token,
+                                 MAIL_WEBSITE               => $website];
                   }
                 }
               }
@@ -269,7 +288,7 @@
 
     // check if the given parameters fulfill minimal requirements
     if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
-        (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {
+        (0 < strlen($info["country"]))) {
       // connect to the database
       if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
         try {
@@ -473,7 +492,7 @@
 	  if (0 < strlen($info["admin"])) { // verify admin token
             // check if the updatable parameters fulfill minimal requirements
             if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
-                (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {            
+                (0 < strlen($info["country"]))) {
               if ($statement = mysqli_prepare($link, "UPDATE data SET name = ?, mail = ?, job = ?, website = ?, ".
                                               "country = ?, city = ?, newsletter = ?, admin_verify_token = NULL ".
                                               "WHERE disabled IS FALSE AND uid = ? AND admin_verify_token = ?")) {
