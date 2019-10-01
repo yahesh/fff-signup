@@ -68,7 +68,7 @@ CREATE TABLE data (
   name                  VARCHAR(256) NOT NULL,
   mail                  VARCHAR(256) NOT NULL, 
   job                   VARCHAR(256) NOT NULL,
-  website               VARCHAR(256) NOT NULL,
+  website               VARCHAR(256),
   country               VARCHAR(256) NOT NULL,
   city                  VARCHAR(256),
   newsletter            BOOLEAN      NOT NULL,

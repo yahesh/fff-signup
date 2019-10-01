@@ -269,7 +269,7 @@
 
     // check if the given parameters fulfill minimal requirements
     if ((0 < strlen($info["name"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["job"])) &&
-        (0 < strlen($info["website"])) && (0 < strlen($info["country"]))) {
+        (0 < strlen($info["country"]))) {
       // connect to the database
       if ($link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT)) {
         try {
