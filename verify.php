@@ -47,9 +47,7 @@
   </head>
   <body>
     Thank you for verifying the registration.<br>
-<?php if ($result) { ?>
-    At the moment there is nothing more to do for you.
-<?php } else { ?>
+<?php if (!$result) { ?>
     Unfortunately, an error has occured. Please try again later or contact us directly.
 <?php } ?>
   </body>

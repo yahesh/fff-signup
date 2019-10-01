@@ -71,13 +71,14 @@ CREATE TABLE data (
   website               VARCHAR(256) NOT NULL,
   country               VARCHAR(256) NOT NULL,
   city                  VARCHAR(256),
-  newsletter            BOOLEAN      NOT NULL,
-  disabled              BOOLEAN      NOT NULL,
+  newsletter            BOOLEAN      NOT NULL DEFAULT FALSE,
+  disabled              BOOLEAN      NOT NULL DEFAULT FALSE,
   admin_verify_token    VARCHAR(40),
   user_newsletter_token VARCHAR(40),
   user_verify_token     VARCHAR(40),
-  verified              BOOLEAN      AS (disabled IS FALSE AND admin_verify_token IS NULL AND user_verify_token IS NULL),
-  subscribed            BOOLEAN      AS (disabled IS FALSE AND admin_verify_token IS NULL AND user_verify_token IS NULL AND newsletter IS TRUE)
+  mailhash              VARCHAR(64)  AS (SHA2(mail, 256)) PERSISTENT UNIQUE KEY,
+  subscribed            BOOLEAN      AS (disabled IS FALSE AND admin_verify_token IS NULL AND user_verify_token IS NULL AND newsletter IS TRUE),
+  verified              BOOLEAN      AS (disabled IS FALSE AND admin_verify_token IS NULL AND user_verify_token IS NULL)
 );
 
 GRANT ALL ON fff.* TO 'fff'@'%' IDENTIFIED BY 'fff';

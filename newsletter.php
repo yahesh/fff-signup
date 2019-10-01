@@ -6,7 +6,7 @@
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
     $result = preview_newsletter($_GET);
-    $link   = (array_key_exists("uid", $_GET) && !array_key_exists("user", $_GET)); 
+    $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET)); 
 ?>
 <!DOCTYPE html>
 <html>
@@ -40,6 +40,7 @@
   } elseif ("POST" === HTTP_METHOD) {
     // verify given information
     $result = newsletter(array_merge($_GET, $_POST));
+    $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
 ?>
 <!DOCTYPE html>
 <html>
@@ -48,9 +49,9 @@
   </head>
   <body>
     Thank you for updating your newsletter subscription.<br>
-<?php if ($result) { ?>
-    At the moment there is nothing more to do for you.
-<?php } else { ?>
+<?php if (!$link && $result) { ?>
+    If you have been registered before, we will send you an e-mail with further instructions.
+<?php } elseif (!$result) { ?>
     Unfortunately, an error has occured. Please try again later or contact us directly.
 <?php } ?>
   </body>
