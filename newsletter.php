@@ -5,8 +5,13 @@
 
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
-    $result = preview_newsletter($_GET);
-    $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET)); 
+    $link  = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
+    $error = []; // has to be defined as an array to be used
+    if ($link) {
+      $result = preview_newsletter($_GET, $error);
+    } else {
+      $result = false; // show the initial form
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,32 +20,46 @@
     <title>Filmmakers for Future - Newsletter (GET)</title>
   </head>
   <body>
-<?php if ($result) { ?>
+<?php
+    if ($result) {
+?>
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
       <select name="newsletter" required>
-        <option value="" disabled>Choose option</option>
-        <option value="0" <?= ($result["newsletter"]) ? "" : "selected" ?>>Just sign the statement.</option>
-        <option value="1" <?= ($result["newsletter"]) ? "selected" : "" ?>>Please keep me updated.</option>
+        <option value="" disabled>Choose option...</option>
+        <option value="0" <?= ($result[MAIL_NEWSLETTER]) ? "" : "selected" ?>>Just sign the statement.</option>
+        <option value="1" <?= ($result[MAIL_NEWSLETTER]) ? "selected" : "" ?>>Please keep me updated.</option>
       </select>
       <input type="submit" value="Update">
     </form>
-<?php } else { ?>
-<?php if ($link) { ?>
+<?php
+    } else {
+      if ($link) {
+?>
     The newsletter subscription update link you used is invalid.<br>
-<?php } ?>
+<?php
+        if (array_key_exists(ERROR_ID, $error)) {
+?>
+    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?><br>
+<?php
+        }
+      }
+?>
     Request a new link:
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
-      <input type="email" name="mail" required maxlength="256" placeholder="Mail">
+      <input type="email" name="newmail" required maxlength="256" placeholder="Email address*">
       <input type="submit" value="Request">
     </form>
-<?php } ?>
+<?php
+    }
+?>
   </body>
 </html>
 <?php
   } elseif ("POST" === HTTP_METHOD) {
     // verify given information
-    $result = newsletter(array_merge($_GET, $_POST));
     $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
+    $error  = []; // has to be defined as an array to be used
+    $result = newsletter(array_merge($_GET, $_POST), $error);
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,11 +68,24 @@
   </head>
   <body>
     Thank you for updating your newsletter subscription.<br>
-<?php if (!$link && $result) { ?>
-    If you have been registered before, we will send you an e-mail with further instructions.
-<?php } elseif (!$result) { ?>
-    Unfortunately, an error has occured. Please try again later or contact us directly.
-<?php } ?>
+<?php
+    if ($result) {
+      if (!$link) {
+?>
+    If you have been registered and verified before, we will send you an e-mail with further instructions.
+<?php
+      }
+    } else {
+?>
+    Unfortunately, an error has occured. Please try again later or contact us directly.<br>
+<?php
+      if (array_key_exists(ERROR_ID, $error)) {
+?>
+    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?>
+<?php
+      }
+    }
+?>
   </body>
 </html>
 <?php
@@ -62,3 +94,4 @@
     http_response_code(405);
     header("Allow: GET, POST");
   }
+

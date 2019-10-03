@@ -5,15 +5,59 @@
 
   if ("GET" === HTTP_METHOD) {
     // get verified users
-    $result = get_verified();
+    $error  = []; // has to be defined as an array to be used
+    $result = get_verified($error);
 ?>
 <!DOCTYPE html>
 <html>
   <head>
+    <style>table, th, td {border: 1px solid black; }</style>
     <title>Filmmakers for Future - Verified (GET)</title>
   </head>
   <body>
-<?php var_dump($result); ?>
+<?php
+    if ($result) {
+      if (0 < count($result)) {
+?>
+    <table>
+      <tr>
+	<th>Name</th>
+	<th>Job</th>
+        <th>Country</th>
+        <th>City</th>
+        <th>Website</th>
+      </tr>
+<?php
+        foreach ($result as $result_item) {
+?>
+      <tr>
+        <td><?= html($result_item[MAIL_NAME]) ?></td>
+        <td><?= html($result_item[MAIL_JOB]) ?></td>
+        <td><?= html($result_item[MAIL_CITY]) ?></td>
+        <td><?= html($result_item[MAIL_COUNTRY]) ?></td>
+        <td><?= html($result_item[MAIL_WEBSITE]) ?></td>
+      </tr>
+<?php
+        }
+?>
+    </table>
+<?php
+      } else {
+?>
+    There are currently no verified persons.
+<?php
+      }
+    } else {
+?>
+    Unfortunately, an error has occured. Please try again later or contact us directly.<br>
+<?php
+      if (array_key_exists(ERROR_ID, $error)) {
+?>
+    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?>
+<?php
+      }
+    }
+?>
   </body>
 </html>
 <?php
@@ -22,3 +66,4 @@
     http_response_code(405);
     header("Allow: GET");
   }
+

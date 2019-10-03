@@ -5,8 +5,14 @@
 
   if ("GET" === HTTP_METHOD) {
     // get information to be verified
-    $result = preview_verify($_GET);
-    $admin = ($result && array_key_exists("uid", $_GET) && array_key_exists("admin", $_GET) && !array_key_exists("user", $_GET));
+    $link  = (array_key_exists("uid", $_GET) && (array_key_exists("admin", $_GET) || array_key_exists("user", $_GET)));
+    $error = []; // has to be defined as an array to be used
+    if ($link) {
+      $result = preview_verify($_GET, $error);
+      $admin = ($result && array_key_exists("uid", $_GET) && array_key_exists("admin", $_GET) && !array_key_exists("user", $_GET));
+    } else {
+      $result = false; // show the initial form
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,30 +21,52 @@
     <title>Filmmakers for Future - Verify (GET)</title>
   </head>
   <body>
-<?php if ($result) { ?>
+<?php
+    if ($result) {
+?>
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
-      <input type="text" name="name" value="<?= html($result["name"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <input type="text" name="mail" value="<?= html($result["mail"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <input type="text" name="job" value="<?= html($result["job"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <input type="text" name="website" value="<?= html($result["website"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <input type="text" name="country" value="<?= html($result["country"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <input type="text" name="city" value="<?= html($result["city"]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
-      <select name="newsletter" <?= ($admin) ? "" : "disabled readonly" ?>>
-        <option value="" disabled>Choose option</option>
-        <option value="0" <?= ($result["newsletter"]) ? "" : "selected" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Just sign the statement.</option>
-        <option value="1" <?= ($result["newsletter"]) ? "selected" : "" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Please keep me updated.</option>
+      <input type="text" name="name" required maxlength="256" placeholder="Full name*" value="<?= html($result[MAIL_NAME]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="mail" required maxlength="256" placeholder="Email address*" value="<?= html($result[MAIL_MAIL]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="job" required maxlength="256" placeholder="Job title*" value="<?= html($result[MAIL_JOB]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="country" required maxlength="256" placeholder="Country*" value="<?= html($result[MAIL_COUNTRY]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="city" maxlength="256" placeholder="City" value="<?= html($result[MAIL_CITY]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <input type="text" name="website" maxlength="256" placeholder="Website / IMDB / Crew United" value="<?= html($result[MAIL_WEBSITE]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <select name="newsletter" required <?= ($admin) ? "" : "disabled readonly" ?>>
+        <option value="" disabled>Choose option...</option>
+        <option value="0" <?= ($result[MAIL_NEWSLETTER]) ? "" : "selected" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Just sign the statement.</option>
+        <option value="1" <?= ($result[MAIL_NEWSLETTER]) ? "selected" : "" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Please keep me updated.</option>
       </select>
       <input type="submit" value="Verify">
     </form>
-<?php } else { ?>
-    The verification link you used is invalid.
-<?php } ?>
+<?php
+    } else {
+      if ($link) {
+?>
+    The verification link you used is invalid.<br>
+<?php
+        if (array_key_exists(ERROR_ID, $error)) {
+?>
+    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?><br>
+<?php
+        }
+      }
+?>
+    Request a new link:
+    <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
+      <input type="email" name="newmail" required maxlength="256" placeholder="Email address*">
+      <input type="submit" value="Request">
+    </form>
+<?php
+    }
+?>
   </body>
 </html>
 <?php
   } elseif ("POST" === HTTP_METHOD) {
     // verify given information
-    $result = verify(array_merge($_GET, $_POST));
+    $link  = (array_key_exists("uid", $_GET) && (array_key_exists("admin", $_GET) || array_key_exists("user", $_GET)));
+    $error  = []; // has to be defined as an array to be used
+    $result = verify(array_merge($_GET, $_POST), $error);
 ?>
 <!DOCTYPE html>
 <html>
@@ -47,9 +75,24 @@
   </head>
   <body>
     Thank you for verifying the registration.<br>
-<?php if (!$result) { ?>
-    Unfortunately, an error has occured. Please try again later or contact us directly.
-<?php } ?>
+<?php
+    if ($result) {
+      if (!$link) {
+?>
+    If you have been registered but not verified before, we will send you an e-mail with further instructions.
+<?php
+      }
+    } else {
+?>
+    Unfortunately, an error has occured. Please try again later or contact us directly.<br>
+<?php
+      if (array_key_exists(ERROR_ID, $error)) {
+?>
+    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?>
+<?php
+      }
+    }
+?>
   </body>
 </html>
 <?php
@@ -58,3 +101,4 @@
     http_response_code(405);
     header("Allow: GET, POST");
   }
+

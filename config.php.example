@@ -23,3 +23,6 @@
   define("USER_VERIFY_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_verify.txt"));
   define("USER_VERIFY_MAIL_SUBJECT", "Filmmakers for Future: Please verify your registration!");
 
+  define("ERRORS_ENABLED", false);
+  define("ERRORS_FOLDER",  __DIR__."/errors/");
+

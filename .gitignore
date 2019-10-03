@@ -1,6 +1,10 @@
 # do not publish configuration
 config.php
 
+# do not publish error logs
+errors/*
+!errors/.gitkeep
+
 # do not publish macOS blergh
 ._*
 .DS_Store

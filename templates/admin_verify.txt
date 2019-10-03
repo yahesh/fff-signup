@@ -5,13 +5,13 @@ the following user has verified their registration:
 Name:       {%NAME}
 Mail:       {%MAIL}
 Job:        {%JOB}
-Website:    {%WEBSITE}
 Country:    {%COUNTRY}
 City:       {%CITY}
+Website:    {%WEBSITE}
 Newsletter: {%NEWSLETTER}
 
 In order to verify the submission please visit the following link and complete the registration:
 
-http://195.192.131.43/verify.php?uid={%UID}&admin={%ADMIN_VERIFY_TOKEN}
+http://195.192.131.43/verify?uid={%UID}&admin={%ADMIN_VERIFY_TOKEN}
 
 Thank you very much.

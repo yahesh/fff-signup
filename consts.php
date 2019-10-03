@@ -1,4 +1,12 @@
 <?php
+  define("APPLICATION", "https://github.com/yahesh/fff-signup");
+  define("VERSION",     "0.3");
+
+  define("ERROR_FUNCTION", "function");
+  define("ERROR_ID",       "id");
+  define("ERROR_MESSAGE",  "message");
+  define("ERROR_TIME",     "time");
+
   define("HTTP_METHOD", strtoupper($_SERVER["REQUEST_METHOD"]));
 
   define("MAIL_ADMIN_VERIFY_TOKEN",    "{%ADMIN_VERIFY_TOKEN}");

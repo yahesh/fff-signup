@@ -31,6 +31,26 @@ server {
 
 	server_name _;
 
+	# prevent access to certain locations
+	location ~ ^\/\.git(\/.*)?$         { return 404; }
+	location ~ ^\/\.gitignore$          { return 404; }
+	location ~ ^\/\.htaccess$           { return 404; }
+	location ~ ^\/CHANGELOG\.md$        { return 404; }
+	location ~ ^\/config\.php$          { return 404; }
+	location ~ ^\/config\.php\.example$ { return 404; }
+	location ~ ^\/consts\.php$          { return 404; }
+	location ~ ^\/errors(\/.*)?$        { return 404; }
+	location ~ ^\/functs\.php$          { return 404; }
+	location ~ ^\/README\.md$           { return 404; }
+	location ~ ^\/templates(\/.*)?$     { return 404; }
+
+	# pretty URLs
+	rewrite ^\/newsletter$ /newsletter.php last;
+	rewrite ^\/register$   /register.php   last;
+	rewrite ^\/subscribed$ /subscribed.php last;
+	rewrite ^\/verified$   /verified.php   last;
+	rewrite ^\/verify$     /verify.php     last;
+
 	location / {
 		try_files $uri $uri/ =404;
 	}
@@ -68,9 +88,10 @@ CREATE TABLE data (
   name                  VARCHAR(256) NOT NULL,
   mail                  VARCHAR(256) NOT NULL, 
   job                   VARCHAR(256) NOT NULL,
-  website               VARCHAR(256),
   country               VARCHAR(256) NOT NULL,
+  website               VARCHAR(256),
   city                  VARCHAR(256),
+  website               VARCHAR(256),
   newsletter            BOOLEAN      NOT NULL DEFAULT FALSE,
   disabled              BOOLEAN      NOT NULL DEFAULT FALSE,
   admin_verify_token    VARCHAR(40),

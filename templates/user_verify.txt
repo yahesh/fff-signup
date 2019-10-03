@@ -4,7 +4,7 @@ welcome to Filmmakers for Future!
 
 In order to verify your submission please visit the following link and complete your registration:
 
-http://195.192.131.43/verify.php?uid={%UID}&user={%USER_VERIFY_TOKEN}
+http://195.192.131.43/verify?uid={%UID}&user={%USER_VERIFY_TOKEN}
 
 If you have not entered your information on our website then please ignore this e-mail. We will not contact you again.
 
