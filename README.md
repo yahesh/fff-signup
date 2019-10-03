@@ -125,5 +125,6 @@ sudo vi /var/www/html/config.php
 ```
 sudo vi /var/www/html/templates/admin_verify.txt
 sudo vi /var/www/html/templates/user_newsletter.txt
-sudo vi /var/www/html/templates/user_verifiy.txt
+sudo vi /var/www/html/templates/user_verified.txt
+sudo vi /var/www/html/templates/user_verify.txt
 ```
