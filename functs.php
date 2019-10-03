@@ -921,8 +921,7 @@
               $updated = null;
               if (0 < strlen($info["admin"])) { // verify admin token
                 // check if the updatable parameters fulfil minimal requirements
-                if ((0 < strlen($info["city"])) && (0 < strlen($info["job"])) && (0 < strlen($info["mail"])) &&
-                    (0 < strlen($info["name"]))) {
+                if ((0 < strlen($info["job"])) && (0 < strlen($info["mail"])) && (0 < strlen($info["name"]))) {
                   if ($statement = mysqli_prepare($link, "UPDATE data SET name=?,mail=?,job=?,country=?,city=?,".
                                                   "website=?,iscompany=?,newsletter=?,admin_verify_token=NULL WHERE ".
                                                   "disabled IS FALSE AND uid=? AND admin_verify_token=?")) {
