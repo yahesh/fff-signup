@@ -31,6 +31,11 @@
       <input type="text" name="country" required maxlength="256" placeholder="Country*" value="<?= html($result[MAIL_COUNTRY]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
       <input type="text" name="city" maxlength="256" placeholder="City" value="<?= html($result[MAIL_CITY]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
       <input type="text" name="website" maxlength="256" placeholder="Website / IMDB / Crew United" value="<?= html($result[MAIL_WEBSITE]) ?>" <?= ($admin) ? "" : "disabled readonly" ?>>
+      <select name="iscompany" required <?= ($admin) ? "" : "disabled readonly" ?>>
+        <option value="" disabled>Choose option...</option>
+        <option value="0" <?= ($result[MAIL_ISCOMPANY]) ? "" : "selected" ?> <?= ($admin) ? "" : "disabled readonly" ?>>I am an individual.</option>
+        <option value="1" <?= ($result[MAIL_ISCOMPANY]) ? "selected" : "" ?> <?= ($admin) ? "" : "disabled readonly" ?>>We are a company.</option>
+      </select>
       <select name="newsletter" required <?= ($admin) ? "" : "disabled readonly" ?>>
         <option value="" disabled>Choose option...</option>
         <option value="0" <?= ($result[MAIL_NEWSLETTER]) ? "" : "selected" ?> <?= ($admin) ? "" : "disabled readonly" ?>>Just sign the statement.</option>

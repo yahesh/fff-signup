@@ -19,6 +19,11 @@
       <input type="text" name="country" required maxlength="256" placeholder="Country*">
       <input type="text" name="city" maxlength="256" placeholder="City">
       <input type="link" name="website" maxlength="256" placeholder="Website / IMDB / Crew United">
+      <select name="iscompany" required>
+        <option value="" disabled selected>Choose option...</option>
+        <option value="0">I am an individual.</option>
+        <option value="1">We are a company.</option>
+      </select>
       <select name="newsletter" required>
         <option value="" disabled selected>Choose option...</option>
         <option value="0">Just sign the statement.</option>

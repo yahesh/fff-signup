@@ -25,7 +25,8 @@
 	<th>Job</th>
         <th>Country</th>
         <th>City</th>
-        <th>Website</th>
+	<th>Website</th>
+        <th>Type</th>
       </tr>
 <?php
         foreach ($result as $result_item) {
@@ -35,7 +36,8 @@
         <td><?= html($result_item[MAIL_JOB]) ?></td>
         <td><?= html($result_item[MAIL_CITY]) ?></td>
         <td><?= html($result_item[MAIL_COUNTRY]) ?></td>
-        <td><?= html($result_item[MAIL_WEBSITE]) ?></td>
+	<td><?= html($result_item[MAIL_WEBSITE]) ?></td>
+        <td><?= ($result_item[MAIL_ISCOMPANY]) ? "Company" : "Individual" ?></td>
       </tr>
 <?php
         }

@@ -1,6 +1,6 @@
 <?php
   define("APPLICATION", "https://github.com/yahesh/fff-signup");
-  define("VERSION",     "0.3");
+  define("VERSION",     "0.4");
 
   define("ERROR_FUNCTION", "function");
   define("ERROR_ID",       "id");
@@ -12,6 +12,7 @@
   define("MAIL_ADMIN_VERIFY_TOKEN",    "{%ADMIN_VERIFY_TOKEN}");
   define("MAIL_CITY",                  "{%CITY}");
   define("MAIL_COUNTRY",               "{%COUNTRY}");
+  define("MAIL_ISCOMPANY",             "{%ISCOMPANY}");
   define("MAIL_JOB",                   "{%JOB}");
   define("MAIL_MAIL",                  "{%MAIL}");
   define("MAIL_NAME",                  "{%NAME}");

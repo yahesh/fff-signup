@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4 (03.10.2019)
+* introduced possibility to distinguish between individuals and companies
+
 ## 0.3 (03.10.2019)
 * introduced the possibility to resend the verification link to the user
 * introduced a file-based error reporting feature that can be enabled through `ERRORS_ENABLED`
