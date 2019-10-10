@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5 (10.10.2019)
+* updated feature set of prototype to feature set of Filmmakers4Future
+* introduced `contact.php`
+* moved files into subfolders
+* cleaned up page sources
+
 ## 0.4 (03.10.2019)
 * introduced possibility to distinguish between individuals and companies
 
