@@ -14,6 +14,12 @@
   define("ADMIN_VERIFY_MAIL_BODY",    file_get_contents(__DIR__."/templates/admin_verify.txt"));
   define("ADMIN_VERIFY_MAIL_SUBJECT", "Filmmakers for Future: Please verify this user registration!");
 
+  define("CONTACT_SUBJECTS", [[MAIL_MAIL => "admin@example.com", MAIL_SUBJECT => "Message for example.com"],
+                              [MAIL_MAIL => "admin@example.net", MAIL_SUBJECT => "Message for example.net"]]);
+
+  define("CONTACT_MAIL_BODY",    file_get_contents(__DIR__."/templates/contact.txt"));
+  define("CONTACT_MAIL_SUBJECT", "Filmmakers for Future: {%SUBJECT}");
+
   define("USER_NEWSLETTER_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_newsletter.txt"));
   define("USER_NEWSLETTER_MAIL_SUBJECT", "Filmmakers for Future: Your link to update your newsletter subscription.");
 
@@ -23,6 +29,9 @@
   define("USER_VERIFY_MAIL_BODY",    file_get_contents(__DIR__."/templates/user_verify.txt"));
   define("USER_VERIFY_MAIL_SUBJECT", "Filmmakers for Future: Please verify your registration!");
 
-  define("ERRORS_ENABLED", false);
-  define("ERRORS_FOLDER",  __DIR__."/errors/");
+  define("ERRORS_ENABLED",    true);
+  define("ERRORS_FOLDER",     __DIR__."/../errors/");
+  define("ERRORS_NEWSLETTER", "Your signature has not yet been verified.");
+  define("ERRORS_REGISTER",   "Your email address has already been used to sign our statement.");
+  define("ERRORS_VERIFY",     "Your signature does not need to be verified.");
 
