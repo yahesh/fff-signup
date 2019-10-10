@@ -3,7 +3,6 @@
   require_once(__DIR__."/lib/functs.php");
   require_once(__DIR__."/config/config.php");
 
-  $admin  = (array_key_exists("uid", $_GET) && array_key_exists("admin", $_GET) && !array_key_exists("user", $_GET));
   $error  = []; // has to be defined as an array to be used
   $link   = (array_key_exists("uid", $_GET) && (array_key_exists("admin", $_GET) || array_key_exists("user", $_GET)));
   $result = null;
@@ -20,6 +19,7 @@
     http_response_code(405);
     header("Allow: GET, POST");
   }
+  $admin = ($result && array_key_exists("uid", $_GET) && array_key_exists("admin", $_GET) && !array_key_exists("user", $_GET));
 
   if ("GET" === HTTP_METHOD) {
 ?>
