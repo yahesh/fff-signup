@@ -1,7 +1,18 @@
 <?php
-  require_once(__DIR__."/config.php");
-  require_once(__DIR__."/consts.php");
-  require_once(__DIR__."/functs.php");
+  require_once(__DIR__."/lib/consts.php");
+  require_once(__DIR__."/lib/functs.php");
+  require_once(__DIR__."/config/config.php");
+
+  $error  = []; // has to be defined as an array to be used
+  if ("GET" === HTTP_METHOD) {
+    // nothing to do
+  } elseif ("POST" === HTTP_METHOD) {
+    $result = register($_POST, $error);
+  } else {
+    // unsupported HTTP method
+    http_response_code(405);
+    header("Allow: GET, POST");
+  }
 
   if ("GET" === HTTP_METHOD) {
 ?>
@@ -35,9 +46,6 @@
 </html>
 <?php
   } elseif ("POST" === HTTP_METHOD) {
-    // register given information
-    $error  = []; // has to be defined as an array to be used
-    $result = register(array_merge($_GET, $_POST), $error);
 ?>
 <!DOCTYPE html>
 <html>
@@ -45,29 +53,23 @@
     <title>Filmmakers for Future - Register (POST)</title>
   </head>
   <body>
-    Thank you for your registration.<br>
 <?php
     if ($result) {
 ?>
-    If you haven't been registered yet, we will send you an e-mail with further instructions.
+    Thank you for submitting the registration.<br>
+    We will send you an e-mail with further instructions.<br>
+    Please check your spam folder, just in case.
 <?php
     } else {
 ?>
-    Unfortunately, an error has occured. Please try again later or contact us directly.<br>
+    <b>Unfortunately, an error has occured<?=  (array_key_exists(ERROR_OUTPUT, $error)) ? ":</b> ".html($error[ERROR_OUTPUT]) : ".</b>" ?><br>
+    Please try again later or <a href="/contact">contact us</a> directly.
+    <?= (array_key_exists(ERROR_ID, $error)) ? "<br>Please provide the following error id when contacting us about this issue: ".html($error[ERROR_ID]) : "" ?>
 <?php
-      if (array_key_exists(ERROR_ID, $error)) {
-?>
-    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?>
-<?php
-      }
     }
 ?>
   </body>
 </html>
 <?php
-  } else {
-    // unsupported HTTP method
-    http_response_code(405);
-    header("Allow: GET, POST");
   }
 

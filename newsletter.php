@@ -1,17 +1,26 @@
 <?php
-  require_once(__DIR__."/config.php");
-  require_once(__DIR__."/consts.php");
-  require_once(__DIR__."/functs.php");
+  require_once(__DIR__."/lib/consts.php");
+  require_once(__DIR__."/lib/functs.php");
+  require_once(__DIR__."/config/config.php");
 
+  $error  = []; // has to be defined as an array to be used
+  $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
+  $result = null;
   if ("GET" === HTTP_METHOD) {
-    // get information to be verified
-    $link  = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
-    $error = []; // has to be defined as an array to be used
     if ($link) {
       $result = preview_newsletter($_GET, $error);
     } else {
       $result = false; // show the initial form
     }
+  } elseif ("POST" === HTTP_METHOD) {
+    $result = newsletter(array_merge($_GET, $_POST), $error);
+  } else {
+    // unsupported HTTP method
+    http_response_code(405);
+    header("Allow: GET, POST");
+  }
+
+  if ("GET" === HTTP_METHOD) {
 ?>
 <!DOCTYPE html>
 <html>
@@ -35,19 +44,17 @@
     } else {
       if ($link) {
 ?>
-    The newsletter subscription update link you used is invalid.<br>
-<?php
-        if (array_key_exists(ERROR_ID, $error)) {
-?>
-    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?><br>
+    The newsletter management link you used is invalid.<br>
+    Please try again later or <a href="/contact">contact us</a> directly.
+    <?= (array_key_exists(ERROR_ID, $error)) ? "<br>Please provide the following error id when contacting us about this issue: ".html($error[ERROR_ID]) : "" ?>
 <?php
         }
-      }
 ?>
-    Request a new link:
     <form action="<?= html($_SERVER['REQUEST_URI']) ?>" method="post">
+      Request a new link:
       <input type="email" name="newmail" required maxlength="256" placeholder="Email address*">
       <input type="submit" value="Request">
+      <b>Please note:</b> You can only manage your newsletter subscription if you have submitted the registration and have finished the verification process. We do not offer a general newsletters.
     </form>
 <?php
     }
@@ -56,10 +63,6 @@
 </html>
 <?php
   } elseif ("POST" === HTTP_METHOD) {
-    // verify given information
-    $link   = (array_key_exists("uid", $_GET) && array_key_exists("user", $_GET));
-    $error  = []; // has to be defined as an array to be used
-    $result = newsletter(array_merge($_GET, $_POST), $error);
 ?>
 <!DOCTYPE html>
 <html>
@@ -67,31 +70,29 @@
     <title>Filmmakers for Future - Newsletter (POST)</title>
   </head>
   <body>
-    Thank you for updating your newsletter subscription.<br>
 <?php
     if ($result) {
-      if (!$link) {
+      if ($link) {
 ?>
-    If you have been registered and verified before, we will send you an e-mail with further instructions.
+      Thank you for updating your newsletter subscription.
+<?php
+      } else {
+?>
+      Thank you for updating your newsletter subscription.<br>
+      We will send you an e-mail with further instructions.<br>
+      Please check your spam folder, just in case.
 <?php
       }
     } else {
 ?>
-    Unfortunately, an error has occured. Please try again later or contact us directly.<br>
+      <b>Unfortunately, an error has occured<?=  (array_key_exists(ERROR_OUTPUT, $error)) ? ":</b> ".html($error[ERROR_OUTPUT]) : ".</b>" ?><br>
+      Please try again later or <a href="/contact">contact us</a> directly.
+      <?= (array_key_exists(ERROR_ID, $error)) ? "<br>Please provide the following error id when contacting us about this issue: ".html($error[ERROR_ID]) : "" ?>
 <?php
-      if (array_key_exists(ERROR_ID, $error)) {
-?>
-    Please provide the following error id when contacting us about this issue: <?= $error[ERROR_ID] ?>
-<?php
-      }
     }
 ?>
   </body>
 </html>
 <?php
-  } else {
-    // unsupported HTTP method
-    http_response_code(405);
-    header("Allow: GET, POST");
   }
 

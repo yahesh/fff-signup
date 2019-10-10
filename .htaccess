@@ -3,19 +3,17 @@
   RewriteBase /
 
   # prevent access to certain locations
-  RewriteRule ^\.git(\/.*)?$         - [R=404,L]
-  RewriteRule ^\.gitignore$          - [R=404,L]
-  RewriteRule ^\.htaccess$           - [R=404,L]
-  RewriteRule ^CHANGELOG\.md$        - [R=404,L]
-  RewriteRule ^config\.php$          - [R=404,L]
-  RewriteRule ^config\.php\.example$ - [R=404,L]
-  RewriteRule ^consts\.php$          - [R=404,L]
-  RewriteRule ^errors(\/.*)?$        - [R=404,L]
-  RewriteRule ^functs\.php$          - [R=404,L]
-  RewriteRule ^README\.md$           - [R=404,L]
-  RewriteRule ^templates(\/.*)?$     - [R=404,L]
+  RewriteRule ^\.git(\/.*)?$  - [R=404,L]
+  RewriteRule ^\.gitignore$   - [R=404,L]
+  RewriteRule ^\.htaccess$    - [R=404,L]
+  RewriteRule ^CHANGELOG\.md$ - [R=404,L]
+  RewriteRule ^config(\/.*)?$ - [R=404,L]
+  RewriteRule ^errors(\/.*)?$ - [R=404,L]
+  RewriteRule ^lib(\/.*)?$    - [R=404,L]
+  RewriteRule ^README\.md$    - [R=404,L]
 
   # pretty URLs
+  RewriteRule ^contact$    /contact.php    [L]
   RewriteRule ^newsletter$ /newsletter.php [L]
   RewriteRule ^register$   /register.php   [L]
   RewriteRule ^subscribed$ /subscribed.php [L]

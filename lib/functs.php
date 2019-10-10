@@ -154,7 +154,7 @@
     }
 
     // handle error storage
-    if ((!$result) && is_array($error)) {
+    if ((!is_array($result)) && is_array($error)) {
       $error[ERROR_FUNCTION] = __FUNCTION__;
       store_error($error);
     }
@@ -229,7 +229,7 @@
     }
 
     // handle error storage
-    if ((!$result) && is_array($error)) {
+    if ((!is_array($result)) && is_array($error)) {
       $error[ERROR_FUNCTION] = __FUNCTION__;
       store_error($error);
     }
@@ -496,7 +496,7 @@
     }
 
     // handle error storage
-    if ((!$result) && is_array($error)) {
+    if ((!is_array($result)) && is_array($error)) {
       $error[ERROR_FUNCTION] = __FUNCTION__;
       $error["info"]         = $info;
       store_error($error);
@@ -644,7 +644,7 @@
     }
 
     // handle error storage
-    if ((!$result) && is_array($error)) {
+    if ((!is_array($result)) && is_array($error)) {
       $error[ERROR_FUNCTION] = __FUNCTION__;
       $error["info"]         = $info;
       store_error($error);
