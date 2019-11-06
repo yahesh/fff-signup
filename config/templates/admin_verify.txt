@@ -13,6 +13,6 @@ Newsletter: {%NEWSLETTER}
 
 In order to verify the submission please visit the following link and complete the registration:
 
-http://195.192.131.43/verify?uid={%UID}&admin={%ADMIN_VERIFY_TOKEN}
+http://localhost:8080/verify?uid={%UID}&admin={%ADMIN_VERIFY_TOKEN}
 
 Thank you very much.

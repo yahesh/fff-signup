@@ -39,7 +39,7 @@
       <input type="text" name="job" required maxlength="256" placeholder="Job title*" value="<?= html($result[MAIL_JOB]) ?>">
       <input type="text" name="country" required maxlength="256" placeholder="Country*" value="<?= html($result[MAIL_COUNTRY]) ?>">
       <input type="text" name="city" maxlength="256" placeholder="City" value="<?= html($result[MAIL_CITY]) ?>">
-      <input type="text" name="website" maxlength="256" placeholder="Website / IMDB / Crew United" value="<?= html($result[MAIL_WEBSITE]) ?>">
+      <input type="text" name="website" maxlength="256" placeholder="Website" value="<?= html($result[MAIL_WEBSITE]) ?>">
       <select name="iscompany" required>
         <option value="" disabled>Choose option...</option>
         <option value="0" <?= ($result[MAIL_ISCOMPANY]) ? "" : "selected" ?>>I am an individual.</option>
@@ -80,6 +80,11 @@
 <html>
   <head>
     <title>Filmmakers for Future - Verify (POST)</title>
+    <script>
+      if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+      }
+    </script>
   </head>
   <body>
 <?php

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6 (06.11.2019)
+* introduced `router.php` for local debugging
+* `send_mail()` now supports to set the `Reply-To` header
+* mails sent via the contact form and verification mails to the admin now have a set `Reply-To` header
+* introduced mandatory `BASE_URL` configuration value as a basis for the CSRF detection
+* before a form submission is handled the HTTP `Referer` header is checked against the `BASE_URL` value
+* introduced JavaScript snippet to prevent form resubmits on browser refreshes
+* fixed `verified.php` table columns
+
 ## 0.5 (10.10.2019)
 * updated feature set of prototype to feature set of Filmmakers4Future
 * introduced `contact.php`

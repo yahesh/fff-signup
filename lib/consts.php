@@ -1,6 +1,6 @@
 <?php
   define("APPLICATION", "https://github.com/yahesh/fff-signup");
-  define("VERSION",     "0.5");
+  define("VERSION",     "0.6");
 
   define("ERROR_FUNCTION", "function");
   define("ERROR_ID",       "id");

@@ -68,6 +68,11 @@
 <html>
   <head>
     <title>Filmmakers for Future - Newsletter (POST)</title>
+    <script>
+      if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+      }
+    </script>
   </head>
   <body>
 <?php

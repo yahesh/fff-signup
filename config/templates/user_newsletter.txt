@@ -4,7 +4,7 @@ you have requested a link to manage your newsletter subscription.
 
 In order to update your newsletter subscription please visit the following link:
 
-http://195.192.131.43/newsletter?uid={%UID}&user={%USER_NEWSLETTER_TOKEN}
+http://localhost:8080/newsletter?uid={%UID}&user={%USER_NEWSLETTER_TOKEN}
 
 If you have not requested this link then please ignore this e-mail.
 

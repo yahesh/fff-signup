@@ -29,7 +29,7 @@
       <input type="text" name="job" required maxlength="256" placeholder="Job title*">
       <input type="text" name="country" required maxlength="256" placeholder="Country*">
       <input type="text" name="city" maxlength="256" placeholder="City">
-      <input type="link" name="website" maxlength="256" placeholder="Website / IMDB / Crew United">
+      <input type="link" name="website" maxlength="256" placeholder="Website">
       <select name="iscompany" required>
         <option value="" disabled selected>Choose option...</option>
         <option value="0">I am an individual.</option>
@@ -51,6 +51,11 @@
 <html>
   <head>
     <title>Filmmakers for Future - Register (POST)</title>
+    <script>
+      if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+      }
+    </script>
   </head>
   <body>
 <?php

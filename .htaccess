@@ -11,6 +11,7 @@
   RewriteRule ^errors(\/.*)?$ - [R=404,L]
   RewriteRule ^lib(\/.*)?$    - [R=404,L]
   RewriteRule ^README\.md$    - [R=404,L]
+  RewriteRule ^router\.php$   - [R=404,L]
 
   # pretty URLs
   RewriteRule ^contact$    /contact.php    [L]

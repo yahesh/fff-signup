@@ -40,6 +40,7 @@ server {
 	location ~ ^\/errors(\/.*)?$ { return 404; }
 	location ~ ^\/lib(\/.*)?$    { return 404; }
 	location ~ ^\/README\.md$    { return 404; }
+        location ~ ^\/router\.php$   { return 404; }
 
 	# pretty URLs
 	rewrite ^\/contact$    /contact.php    last;
