@@ -25,8 +25,8 @@
   // do some URL handling
   $result = false;
   $path   = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-  if (preg_match_array(["@^/contact$@", "@^/newsletter$@", "@^/register$@", "@^/subscribed$@",
-                        "@^/verified$@", "@^/verify$@"], $path)) {
+  if (preg_match_array(["@^\/contact$@", "@^\/newsletter$@", "@^\/register$@", "@^\/subscribed$@",
+                        "@^\/verified$@", "@^\/verify$@"], $path)) {
     // pretty URLs
     require_once(__DIR__."$path.php");
     $result = true;
