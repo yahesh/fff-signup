@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7 (17.04.2020)
+* introduced `send.php`
+* introduced `send_newsletter()` to send newsletters to verified subscribers
+* introduced the configuration value `NEWSLETTER_SEND_PASSWORD`
+* `send_mail()` now supports batch submission of mails
+
 ## 0.6 (06.11.2019)
 * introduced `router.php` for local debugging
 * `send_mail()` now supports to set the `Reply-To` header

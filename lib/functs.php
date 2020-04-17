@@ -88,6 +88,30 @@
     return $result;
   }
 
+  function convert_placeholder_to_mailgun_key($name) {
+    $result = $name;
+
+    if (1 === preg_match("@^\{\%(?P<name>[A-Za-z\_]+)\}$@", $name, $matches)) {
+      if (array_key_exists("name", $matches)) {
+        $result = strtolower(trim($matches["name"]));
+      }
+    }
+
+    return $result;
+  }
+
+  function convert_placeholder_to_mailgun_placeholder($name) {
+    $result = $name;
+
+    if (1 === preg_match("@^\{\%(?P<name>[A-Za-z\_]+)\}$@", $name, $matches)) {
+      if (array_key_exists("name", $matches)) {
+        $result = "%recipient.".strtolower(trim($matches["name"]))."%";
+      }
+    }
+
+    return $result;
+  }
+
   // generate a random and collision-free token of length 40
   function generate_token() {
     return strtolower(dechex(time()).bin2hex(random_bytes(16)));
@@ -876,24 +900,69 @@
 
     if ($curl = curl_init()) {
       try {
-        // replace placeholders
-        if (null !== $placeholders) {
-          $body    = str_replace(array_keys($placeholders), array_values($placeholders), $body);
-          $subject = str_replace(array_keys($placeholders), array_values($placeholders), $subject);
+        // set default values for parameters
+        $parameters = ["from" => MAILGUN_FROM];
+
+        // set reply-to address if given
+        if (null !== $replyto) {
+          $parameters["h:Reply-To"] = $replyto;
         }
 
-        if (null !== $replyto) {
-          $parameters = http_build_query(["from"       => MAILGUN_FROM,
-                                          "to"         => $recipient,
-                                          "subject"    => $subject,
-                                          "text"       => $body,
-                                          "h:Reply-To" => $replyto]);
+        if (is_array($recipient)) {
+          // make sure that placeholders is an array
+          if (null === $placeholders) {
+            $placeholders = [];
+          }
+
+          // make sure that each recipient has an entry in placeholders
+          $replaced = false;
+          foreach ($recipient as $recipient_item) {
+            if (!array_key_exists($recipient_item, $placeholders)) {
+              $placeholders[$recipient_item] = [];
+            } else {
+              // rename placeholders from internal name to MAILGUN name
+              $keynames = [];
+              foreach ($placeholders[$recipient_item] as $key => $value) {
+                // set the MAILGUN key
+                $placeholders[$recipient_item][convert_placeholder_to_mailgun_key($key)] = $value;
+
+                // unset the internal placeholder
+                unset($placeholders[$recipient_item][$key]);
+
+                // collect old and new placeholder names
+                if (!$replaced) {
+                  $keynames[$key] = convert_placeholder_to_mailgun_placeholder($key);
+                }
+              }
+
+              // rename placeholders from internal to MAILGUN in body and subject
+              if (!$replaced) {
+                $body    = str_replace(array_keys($keynames), array_values($keynames), $body);
+                $subject = str_replace(array_keys($keynames), array_values($keynames), $subject);
+
+                $replaced = true;
+              }
+            }
+          }
+
+          $parameters["recipient-variables"] = json_encode($placeholders);
+          $parameters["subject"]             = $subject;
+          $parameters["text"]                = $body;
+          $parameters["to"]                  = implode(", ", $recipient);
         } else {
-          $parameters = http_build_query(["from"    => MAILGUN_FROM,
-                                          "to"      => $recipient,
-                                          "subject" => $subject,
-                                          "text"    => $body]);
+          // replace placeholders
+          if (null !== $placeholders) {
+            $body    = str_replace(array_keys($placeholders), array_values($placeholders), $body);
+            $subject = str_replace(array_keys($placeholders), array_values($placeholders), $subject);
+          }
+
+          $parameters["subject"] = $subject;
+          $parameters["text"]    = $body;
+          $parameters["to"]      = $recipient;
         }
+
+        // convert to query string
+        $parameters = http_build_query($parameters);
 
         if (curl_setopt_array($curl,
                               [CURLOPT_URL            => MAILGUN_ENDPOINT,
@@ -947,6 +1016,105 @@
       $error["subject"]      = $subject;
       $error["body"]         = $body;
       $error["placeholders"] = $placeholders;
+      store_error($error);
+    }
+
+    return $result;
+  }
+
+  // send newsletter mail
+  function send_newsletter($info, &$error = null) {
+    $result = false;
+
+    if (check_form()) {
+      if (is_array($info)) {
+        //normalize texts
+        $info["country"]  = strtolower(trim(get_element($info, "country")));
+        $info["message"]  = trim(get_element($info, "message"));
+        $info["password"] = get_element($info, "password");
+        $info["subject"]  = trim(get_element($info, "subject"));
+
+        // check if the given parameters fulfil minimal requirements
+        if ((0 < strlen($info["message"])) && (0 < strlen($info["password"])) && (0 < strlen($info["subject"]))) {
+          // check that the newsletter password has been set and that the given password is correct
+          if ((null !== NEWSLETTER_SEND_PASSWORD) && password_verify($info["password"], NEWSLETTER_SEND_PASSWORD)) {
+            // retrieve subscribers
+            $subscriberserror = [];
+            $subscribers      = get_subscribed($subscriberserror);
+            if (false !== $subscribers) {
+              // extract recipients from subscribers
+              $recipients = [];
+              foreach ($subscribers as $subscriber) {
+                if ((0 === strlen($info["country"])) ||
+                    (0 === strcasecmp($subscriber[MAIL_COUNTRY], $info["country"]))) {
+                  // prepare subscriber boolean values
+                  $subscriber[MAIL_ISCOMPANY]  = ($subscriber[MAIL_ISCOMPANY]) ? "yes" : "no";
+                  $subscriber[MAIL_NEWSLETTER] = ($subscriber[MAIL_NEWSLETTER]) ? "yes" : "no";
+
+                  // add subscriber to list of recipients
+                  $recipients[$subscriber[MAIL_MAIL]] = $subscriber;
+                }
+              }
+
+              // check that some recipients are left
+              if (0 < count($recipients)) {
+                // set result to default
+                $result = true;
+
+                // handle newsletter sending in batches
+                for ($index = 0; $index < ceil(count($recipients) / MAILGUN_BATCH_SIZE); $index++) {
+                  $batch = array_slice($recipients, $index*MAILGUN_BATCH_SIZE, MAILGUN_BATCH_SIZE, true);
+
+                  // send contact mail to recipient
+                  $senderror = [];
+                  $tmpresult = send_mail(array_keys($batch), $info["subject"], $info["message"], $batch, $senderror);
+
+                  if (!$tmpresult) {
+                    if (is_array($error)) {
+                      $error[ERROR_MESSAGE]                 = "batch could not be sent";
+                      $error["senderror-".strval($index+1)] = $senderror;
+                    }
+
+                    // mix temp result into result
+                    $result = $result && $tmpresult;
+                  }
+                }
+              } else {
+                if (is_array($error)) {
+                  $error[ERROR_MESSAGE] = "no recipients selected";
+                }
+              }
+            } else {
+              if (is_array($error)) {
+                $error[ERROR_MESSAGE]      = "subscribers could not be retrieved";
+                $error["subscriberserror"] = $subscriberserror;
+              }
+            }
+          } else {
+            if (is_array($error)) {
+              $error[ERROR_MESSAGE] = "newsletter send password is not set or given password is incorrect";
+            }
+          }
+        } else {
+          if (is_array($error)) {
+            $error[ERROR_MESSAGE] = "mandatory info is not provided";
+          }
+        }
+      } else {
+        if (is_array($error)) {
+          $error[ERROR_MESSAGE] = "info is not an array";
+        }
+      }
+    } else {
+      if (is_array($error)) {
+        $error[ERROR_MESSAGE] = "form submission seems to be malicious";
+      }
+    }
+
+    // handle error storage
+    if ((!$result) && is_array($error)) {
+      $error[ERROR_FUNCTION] = __FUNCTION__;
+      $error["info"]         = $info;
       store_error($error);
     }
 

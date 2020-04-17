@@ -12,7 +12,12 @@
   define("MAILGUN_ENDPOINT", "https://api.eu.mailgun.net/v3/mg.filmmakersforfuture.org/messages");
   define("MAILGUN_FROM",     "Filmmakers for Future <noreply@mg.filmmakersforfuture.org>");
 
-  // this is the databse configuration - see the README.md how to set up the database
+  // this is the newsletter submission password, it has to be set in the CRYPT password format,
+  // the value can be generated via:
+  // php -r 'print(str_replace("\$", "\\\$", password_hash(readline("Password: "), PASSWORD_DEFAULT)."\n"));'
+  define("NEWSLETTER_SEND_PASSWORD", null);
+
+  // this is the database configuration - see the README.md how to set up the database
   define("DB_HOST", "127.0.0.1");
   define("DB_PORT", 3306);
   define("DB_NAME", "fff");

@@ -17,6 +17,7 @@
   RewriteRule ^contact$    /contact.php    [L]
   RewriteRule ^newsletter$ /newsletter.php [L]
   RewriteRule ^register$   /register.php   [L]
+  RewriteRuke ^send$       /send.php       [L]
   RewriteRule ^subscribed$ /subscribed.php [L]
   RewriteRule ^verified$   /verified.php   [L]
   RewriteRule ^verify$     /verify.php     [L]

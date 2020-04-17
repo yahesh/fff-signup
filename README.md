@@ -46,6 +46,7 @@ server {
 	rewrite ^\/contact$    /contact.php    last;
 	rewrite ^\/newsletter$ /newsletter.php last;
 	rewrite ^\/register$   /register.php   last;
+	rewrite ^\/send$       /send.php       last;
 	rewrite ^\/subscribed$ /subscribed.php last;
 	rewrite ^\/verified$   /verified.php   last;
 	rewrite ^\/verify$     /verify.php     last;
@@ -112,6 +113,12 @@ EXIT;
 ```
 
 ## Configure the software
+
+### Generate the Newsletter Send Password
+
+```
+php -r 'print(str_replace("\$", "\\\$", password_hash(readline("Password: "), PASSWORD_DEFAULT)."\n"));'
+```
 
 ### Set the configuration values
 
