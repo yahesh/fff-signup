@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8 (18.04.2020)
+* disable modification of the newsletter subscription during the admin verification step
+* support default mail subject and body for newsletter submission
+* introduced the configuration values `NEWSLETTER_MAIL_BODY` and `NEWSLETTER_MAIL_SUBJECT`
+
 ## 0.7 (17.04.2020)
 * introduced `send.php`
 * introduced `send_newsletter()` to send newsletters to verified subscribers

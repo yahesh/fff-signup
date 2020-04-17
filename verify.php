@@ -45,7 +45,7 @@
         <option value="0" <?= ($result[MAIL_ISCOMPANY]) ? "" : "selected" ?>>I am an individual.</option>
         <option value="1" <?= ($result[MAIL_ISCOMPANY]) ? "selected" : "" ?>>We are a company.</option>
       </select>
-      <select name="newsletter" required>
+      <select name="newsletter" required <?= ($admin) ? "disabled readonly" : "" ?>>
         <option value="" disabled>Choose option...</option>
         <option value="0" <?= ($result[MAIL_NEWSLETTER]) ? "" : "selected" ?>>Just sign the statement.</option>
         <option value="1" <?= ($result[MAIL_NEWSLETTER]) ? "selected" : "" ?>>Please keep me updated.</option>
