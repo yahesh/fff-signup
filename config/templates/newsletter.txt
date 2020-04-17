@@ -1,0 +1,5 @@
+Dear {%NAME},
+
+
+
+Unsubscribe: http://localhost:8080/newsletter?uid={%UID}&user={%USER_NEWSLETTER_TOKEN}

@@ -54,8 +54,8 @@
         }
 ?>
       </select>
-      <input type="text" name="subject" required maxlength="256" placeholder="Subject*">
-      <textarea name="message" required rows="5" placeholder="Message*"></textarea>
+      <input type="text" name="subject" required maxlength="256" placeholder="Subject*" value="<?= html(NEWSLETTER_MAIL_SUBJECT) ?>">
+      <textarea name="message" required rows="5" placeholder="Message*"><?= html(NEWSLETTER_MAIL_BODY) ?></textarea>
       <input type="submit" value="Send">
     </form>
 <?php
