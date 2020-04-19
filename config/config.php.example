@@ -5,7 +5,7 @@
   // this is the base URL expected in REFERER headers sent by browsers when submitting a form,
   // this value is used to check the actual REFERER header during a form submission,
   // the check is used to prevent cross-site request forgery attempts
-  define("BASE_URL", http://localhost:8080/);
+  define("BASE_URL", "http://localhost:8080/");
 
   // this is the MailGun configuration needed to send mails
   define("MAILGUN_AUTH",     "api:key-0123456789abcdef0123456789abcdef");
